@@ -1,0 +1,19 @@
+{% extends "expenses/base.html" %}
+{% block title %}Delete{% endblock %}
+{% block page_title %}Confirm Delete{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:480px; text-align:center;">
+    <div style="font-size:48px; margin-bottom:12px;">⚠️</div>
+    <h2 style="color:#dc2626; margin-bottom:8px;">Delete this record?</h2>
+    <p style="color:#6b7280; margin-bottom:24px;">
+        <strong>{{ object }}</strong><br>
+        This action cannot be undone.
+    </p>
+    <form method="post" style="display:flex; gap:12px; justify-content:center;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">🗑 Yes, Delete</button>
+        <a href="{% url back_url %}" class="btn btn-secondary">← Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,142 @@
+<!-- expenses/templates/expenses/base_manager.html -->
+<!-- MANAGER BASE - For managers/approvers -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ExpenseFlow{% endblock %} | Manager</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --ink: #1a1f36; --accent: #7c3aed; --accent-2: #a855f7;
+            --surface: #ffffff; --bg: #f0f4f9; --border: #e2e8f0;
+            --success: #059669; --warn: #d97706; --danger: #dc2626;
+            --ink-soft: #6b7280; --radius: 10px; --shadow: 0 2px 12px rgba(0,0,0,.08);
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 240px; background: var(--ink); color: #fff; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-brand { padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,.1); }
+        .sidebar-brand h1 { font-size: 18px; font-weight: 700; }
+        .sidebar-brand p { font-size: 11px; opacity: .5; margin-top: 2px; text-transform: uppercase; letter-spacing: .5px; }
+        .sidebar nav { padding: 12px 0; flex: 1; }
+        .nav-section { padding: 8px 20px 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; opacity: .4; }
+        .sidebar a { display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: rgba(255,255,255,.75); text-decoration: none; font-size: 14px; transition: background .15s; border-left: 3px solid transparent; }
+        .sidebar a:hover { background: rgba(255,255,255,.08); color: #fff; border-left-color: var(--accent); }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,.1); font-size: 13px; }
+        .sidebar-footer a { color: rgba(255,255,255,.6); text-decoration: none; }
+        .user-profile-section { padding: 12px 20px; border-top: 1px solid rgba(255,255,255,.1); border-bottom: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.05); }
+        .user-profile-link { display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: 8px; cursor: pointer; transition: background .15s; text-decoration: none; }
+        .user-profile-link:hover { background: rgba(255,255,255,.1); }
+        .profile-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; flex-shrink: 0; }
+        .profile-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .user-info { flex: 1; min-width: 0; }
+        .user-name { font-size: 13px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-role { font-size: 11px; opacity: .7; color: #fff; }
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; }
+        .topbar h2 { font-size: 18px; font-weight: 600; }
+        .topbar-user { font-size: 13px; color: var(--ink-soft); display: flex; align-items: center; gap: 8px; }
+        .avatar { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 600; overflow: hidden; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .content { padding: 28px; flex: 1; overflow-y: auto; }
+        .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-bottom: 24px; }
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; text-decoration: none; transition: opacity .15s; }
+        .btn:hover { opacity: .88; }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-secondary { background: var(--bg); color: var(--ink); border: 1px solid var(--border); }
+        .btn-sm { padding: 5px 12px; font-size: 12px; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: var(--bg); padding: 10px 14px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--ink-soft); }
+        td { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafbff; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-pending { background: #fef9c3; color: #92400e; }
+        .badge-approved { background: #d1fae5; color: #065f46; }
+        .badge-rejected { background: #fee2e2; color: #991b1b; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,58,237,.1); }
+        .messages { margin-bottom: 20px; }
+        .alert { padding: 12px 16px; border-radius: 8px; font-size: 14px; margin-bottom: 8px; }
+        .alert-success { background: #d1fae5; color: #065f46; }
+        .alert-error { background: #fee2e2; color: #991b1b; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border-top: 3px solid var(--accent); }
+        .stat-number { font-size: 32px; font-weight: 700; line-height: 1; }
+        .stat-label { font-size: 12px; color: var(--ink-soft); margin-top: 4px; text-transform: uppercase; letter-spacing: .5px; }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h1>💼 ExpenseFlow</h1>
+            <p>Manager Portal</p>
+        </div>
+        
+        <!-- User Profile -->
+        <div class="user-profile-section">
+            <a href="{% url 'profile' %}" class="user-profile-link">
+                {% if user.manager.profile_photo %}
+                    <div class="profile-avatar"><img src="{{ user.manager.profile_photo.url }}" alt="Profile"></div>
+                {% else %}
+                    <div class="profile-avatar">{{ user.username|first|upper }}</div>
+                {% endif %}
+                <div class="user-info">
+                    <div class="user-name">{{ user.username }}</div>
+                    <div class="user-role">👔 Manager</div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Navigation -->
+        <nav>
+            <div class="nav-section">Main</div>
+            <a href="{% url 'dashboard' %}">🏠 Dashboard</a>
+            
+            <div class="nav-section">Approvals</div>
+            <a href="{% url 'expense_list' %}">📋 All Expenses</a>
+            <a href="{% url 'expense_list' %}?status=Pending">⏳ Pending Review</a>
+            
+            <div class="nav-section">People</div>
+            <a href="{% url 'employee_list' %}">👥 All Employees</a>
+            
+            <div class="nav-section">Account</div>
+            <a href="{% url 'profile' %}">👤 My Profile</a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="{% url 'logout' %}">→ Logout</a>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main">
+        <div class="topbar">
+            <h2>{% block page_title %}Dashboard{% endblock %}</h2>
+            <div class="topbar-user">
+                {% if user.manager.profile_photo %}<div class="avatar"><img src="{{ user.manager.profile_photo.url }}" alt="Profile"></div>{% else %}<div class="avatar">{{ user.username|first|upper }}</div>{% endif %}
+                <a href="{% url 'profile' %}" style="color:var(--ink-soft); text-decoration:none;">{{ user.username }}</a>
+            </div>
+        </div>
+        <div class="content">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
+</body>
+</html>

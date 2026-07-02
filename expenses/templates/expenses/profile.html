@@ -1,0 +1,98 @@
+<!-- expenses/templates/expenses/profile.html -->
+{% extends "expenses/base.html" %}
+{% block title %}Profile{% endblock %}
+{% block page_title %}👤 My Profile{% endblock %}
+
+{% block content %}
+<div style="max-width:600px;">
+    <!-- Profile Card -->
+    <div class="card">
+        <div style="display:flex; gap:24px; align-items:flex-start;">
+            
+            <!-- Profile Picture -->
+            <div style="text-align:center;">
+                {% if profile_photo %}
+                    <img src="{{ profile_photo.url }}" 
+                         style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #2563eb; box-shadow: 0 4px 12px rgba(0,0,0,.15);">
+                {% else %}
+                    <div style="width:120px; height:120px; border-radius:50%; background: linear-gradient(135deg, #2563eb, #7c3aed); display:flex; align-items:center; justify-content:center; color:#fff; font-size:48px;">
+                        {{ username|first|upper }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Profile Info -->
+            <div style="flex:1;">
+                <h2 style="font-size:24px; margin-bottom:8px;">{{ name }}</h2>
+                <p style="color:#6b7280; margin-bottom:16px;">
+                    <span style="display:inline-block; background:#f0f4f9; padding:6px 12px; border-radius:20px; font-size:13px;">
+                        {{ role_emoji }} {{ role }}
+                    </span>
+                </p>
+                
+                <!-- Profile Details -->
+                <div style="background:#f9fafb; padding:16px; border-radius:8px;">
+                    <div style="margin-bottom:12px;">
+                        <p style="color:#6b7280; font-size:12px; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px;">Username</p>
+                        <p style="font-weight:500;">{{ username }}</p>
+                    </div>
+                    
+                    <div style="margin-bottom:12px;">
+                        <p style="color:#6b7280; font-size:12px; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px;">Email</p>
+                        <p style="font-weight:500;">{{ email }}</p>
+                    </div>
+                    
+                    <div style="margin-bottom:12px;">
+                        <p style="color:#6b7280; font-size:12px; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px;">Department</p>
+                        <p style="font-weight:500;">{{ department }}</p>
+                    </div>
+                    
+                    <div>
+                        <p style="color:#6b7280; font-size:12px; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px;">Account Type</p>
+                        <p style="font-weight:500;">
+                            {% if is_employee %}
+                                👤 Employee - Can submit expenses
+                            {% elif is_manager %}
+                                👔 Manager - Can approve expenses
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div style="margin-top:24px; display:flex; gap:10px; flex-wrap:wrap; border-top:1px solid #e2e8f0; padding-top:24px;">
+            <a href="{% url 'profile_edit' %}" class="btn btn-primary">✏️ Edit Profile</a>
+            
+            {% if profile_photo %}
+            <form method="post" action="{% url 'profile_delete_photo' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Delete profile picture?')">🗑 Remove Photo</button>
+            </form>
+            {% endif %}
+            
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>
+        </div>
+    </div>
+    
+    <!-- Account Settings -->
+    <div class="card">
+        <h3 style="font-size:15px; margin-bottom:16px;">⚙️ Account Settings</h3>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary" style="text-align:center; justify-content:center;">
+                🏠 Dashboard
+            </a>
+            <a href="{% url 'expense_list' %}" class="btn btn-secondary" style="text-align:center; justify-content:center;">
+                📄 My Expenses
+            </a>
+        </div>
+        
+        <div style="margin-top:16px; padding-top:16px; border-top:1px solid #e2e8f0;">
+            <p style="color:#6b7280; font-size:13px; margin-bottom:8px;">Want to change your password?</p>
+            <a href="#" class="btn btn-secondary btn-sm">Change Password</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

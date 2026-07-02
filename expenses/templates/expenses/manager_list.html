@@ -1,0 +1,45 @@
+{% extends "expenses/base.html" %}
+{% block title %}Managers{% endblock %}
+{% block page_title %}Managers{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="font-size:16px;">All Managers</h3>
+        <a href="{% url 'manager_add' %}" class="btn btn-primary btn-sm">➕ Add Manager</a>
+    </div>
+    {% if managers %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Approvals Made</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mgr in managers %}
+            <tr>
+                <td><strong>{{ mgr.name }}</strong></td>
+                <td>{{ mgr.department }}</td>
+                <td>
+                    <span style="display:inline-block; background:#f0f4f9; padding:4px 10px; border-radius:20px; font-size:12px;">
+                        {{ mgr.approvals.count }}
+                    </span>
+                </td>
+                <td style="display:flex; gap:6px;">
+                    <a href="{% url 'manager_edit' mgr.pk %}" class="btn btn-warning btn-sm">✏️ Edit</a>
+                    <a href="{% url 'manager_delete' mgr.pk %}" class="btn btn-danger btn-sm">🗑 Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#6b7280; text-align:center; padding:40px;">
+        No managers yet. <a href="{% url 'manager_add' %}">Add the first one →</a>
+    </p>
+    {% endif %}
+</div>
+{% endblock %}

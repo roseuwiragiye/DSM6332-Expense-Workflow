@@ -1,0 +1,73 @@
+{% extends "expenses/base.html" %}
+{% block title %}Expenses{% endblock %}
+{% block page_title %}All Expenses{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h3 style="font-size:15px; margin-bottom:14px;">🔍 Search & Filter</h3>
+    <form method="get" style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+        <div class="form-group" style="margin:0; flex:1; min-width:150px;">
+            <label>Employee Name</label>
+            {{ search_form.employee_name }}
+        </div>
+        <div class="form-group" style="margin:0; flex:1; min-width:140px;">
+            <label>Date From</label>
+            {{ search_form.date_from }}
+        </div>
+        <div class="form-group" style="margin:0; flex:1; min-width:140px;">
+            <label>Date To</label>
+            {{ search_form.date_to }}
+        </div>
+        <div class="form-group" style="margin:0; flex:1; min-width:140px;">
+            <label>Status</label>
+            {{ search_form.status }}
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a href="{% url 'expense_list' %}" class="btn btn-secondary">Reset</a>
+    </form>
+</div>
+
+<div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="font-size:15px;">{{ expenses.count }} expense{{ expenses.count|pluralize }} found</h3>
+        
+        <!-- ONLY SHOW "SUBMIT EXPENSE" BUTTON FOR EMPLOYEES (NOT MANAGERS) -->
+        {% if not user.manager %}
+            <a href="{% url 'expense_add' %}" class="btn btn-primary btn-sm">➕ Submit Expense</a>
+        {% endif %}
+    </div>
+    
+    {% if expenses %}
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th><th>Employee</th><th>Category</th>
+                <th>Amount (RWF)</th><th>Date</th><th>Status</th><th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exp in expenses %}
+            <tr>
+                <td><strong>{{ exp.title }}</strong></td>
+                <td>{{ exp.employee.name }}</td>
+                <td>{{ exp.category.name }}</td>
+                <td>{{ exp.amount|floatformat:2 }}</td>
+                <td>{{ exp.date }}</td>
+                <td><span class="badge badge-{{ exp.status|lower }}">{{ exp.status }}</span></td>
+                <td style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <a href="{% url 'expense_detail' exp.pk %}" class="btn btn-secondary btn-sm">View</a>
+                    {% if exp.status == 'Pending' %}
+                    <a href="{% url 'expense_edit' exp.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'approval_create' exp.pk %}" class="btn btn-success btn-sm">Review</a>
+                    {% endif %}
+                    <a href="{% url 'expense_delete' exp.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#6b7280; text-align:center; padding:40px;">No expenses match your search.</p>
+    {% endif %}
+</div>
+{% endblock %}

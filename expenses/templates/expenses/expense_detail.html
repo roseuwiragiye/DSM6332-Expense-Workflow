@@ -1,0 +1,70 @@
+{% extends "expenses/base.html" %}
+{% block title %}Expense Detail{% endblock %}
+{% block page_title %}Expense Detail{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:640px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+        <div>
+            <h2 style="font-size:20px;">{{ expense.title }}</h2>
+            <p style="color:#6b7280; font-size:13px;">Submitted {{ expense.created_at|date:"d M Y, H:i" }}</p>
+        </div>
+        <span class="badge badge-{{ expense.status|lower }}" style="font-size:14px; padding:6px 14px;">
+            {{ expense.status }}
+        </span>
+    </div>
+
+    <table style="margin-bottom:20px;">
+        <tr>
+            <td style="color:#6b7280; width:160px; border:none;">Employee</td>
+            <td style="border:none;"><strong>{{ expense.employee.name }}</strong> – {{ expense.employee.department }}</td>
+        </tr>
+        <tr>
+            <td style="color:#6b7280; border:none;">Category</td>
+            <td style="border:none;">{{ expense.category.name }}</td>
+        </tr>
+        <tr>
+            <td style="color:#6b7280; border:none;">Amount</td>
+            <td style="border:none; font-size:18px; font-weight:700;">RWF {{ expense.amount|floatformat:2 }}</td>
+        </tr>
+        <tr>
+            <td style="color:#6b7280; border:none;">Date</td>
+            <td style="border:none;">{{ expense.date }}</td>
+        </tr>
+        {% if expense.receipt %}
+        <tr>
+            <td style="color:#6b7280; border:none;">Receipt</td>
+            <td style="border:none;">
+                <a href="{{ expense.receipt.url }}" target="_blank" class="btn btn-secondary btn-sm">📎 View Receipt</a>
+            </td>
+        </tr>
+        {% endif %}
+    </table>
+
+    {% if approval %}
+    <div style="background:#f0f4f9; border-radius:8px; padding:16px; margin-bottom:20px;">
+        <h4 style="font-size:13px; text-transform:uppercase; letter-spacing:.5px; color:#6b7280; margin-bottom:10px;">Approval Decision</h4>
+        <p><strong>Decision:</strong>
+            <span class="badge badge-{{ approval.decision|lower }}">{{ approval.decision }}</span>
+        </p>
+        <p style="margin-top:8px;"><strong>Manager:</strong> {{ approval.manager.name }}</p>
+        {% if approval.comment %}
+        <p style="margin-top:8px;"><strong>Comment:</strong> {{ approval.comment }}</p>
+        {% endif %}
+        <p style="margin-top:8px; font-size:12px; color:#6b7280;">Decided {{ approval.decided_at|date:"d M Y, H:i" }}</p>
+    </div>
+    {% elif expense.status == 'Pending' %}
+    <div style="margin-bottom:20px;">
+        <a href="{% url 'approval_create' expense.pk %}" class="btn btn-success">✅ Review & Decide</a>
+    </div>
+    {% endif %}
+
+    <div style="display:flex; gap:10px;">
+        <a href="{% url 'expense_list' %}" class="btn btn-secondary">← Back to List</a>
+        {% if expense.status == 'Pending' %}
+        <a href="{% url 'expense_edit' expense.pk %}" class="btn btn-warning">✏️ Edit</a>
+        {% endif %}
+        <a href="{% url 'expense_delete' expense.pk %}" class="btn btn-danger">🗑 Delete</a>
+    </div>
+</div>
+{% endblock %}

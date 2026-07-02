@@ -1,0 +1,270 @@
+<!-- expenses/templates/expenses/login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if mode == 'register' %}Register{% else %}Login{% endif %} | ExpenseFlow</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1a1f36 0%, #2563eb 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 24px 60px rgba(0,0,0,.3);
+        }
+        .logo { font-size: 32px; margin-bottom: 4px; }
+        h1 { font-size: 22px; color: #1a1f36; margin-bottom: 4px; }
+        .sub { font-size: 13px; color: #6b7280; margin-bottom: 28px; }
+        .form-group { margin-bottom: 16px; }
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.15s;
+        }
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.15s;
+        }
+        .btn:hover { background: #1d4ed8; }
+        .link {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+        .link a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        /* Radio button styling for role selection */
+        .role-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .role-option {
+            position: relative;
+        }
+        .role-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .role-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: #f9fafb;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+        }
+        .role-option input[type="radio"]:checked + .role-label {
+            border-color: #2563eb;
+            background: #eff6ff;
+            color: #1e40af;
+        }
+        .role-emoji {
+            font-size: 24px;
+        }
+        .field-error {
+            color: #dc2626;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <div class="logo">💼</div>
+    <h1>{% if mode == 'register' %}Create Account{% else %}Welcome back{% endif %}</h1>
+    <p class="sub">{% if mode == 'register' %}ExpenseFlow – DSM6332 Assignment{% else %}Sign in to ExpenseFlow{% endif %}</p>
+
+    <!-- Display error messages -->
+    {% if messages %}
+        {% for msg in messages %}
+        <div class="error">{{ msg }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if mode == 'register' %}
+    <!-- REGISTRATION FORM -->
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Username -->
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">Username</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                {% for err in form.username.errors %}
+                <p class="field-error">{{ err }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+            <label for="{{ form.email.id_for_label }}">Email</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                {% for err in form.email.errors %}
+                <p class="field-error">{{ err }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Full Name -->
+        <div class="form-group">
+            <label for="{{ form.name.id_for_label }}">Full Name</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+                {% for err in form.name.errors %}
+                <p class="field-error">{{ err }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Department -->
+        <div class="form-group">
+            <label for="{{ form.department.id_for_label }}">Department</label>
+            {{ form.department }}
+            {% if form.department.errors %}
+                {% for err in form.department.errors %}
+                <p class="field-error">{{ err }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Role Selection (Radio buttons with custom styling) -->
+        <div class="form-group">
+            <label>{{ form.role.label }}</label>
+            <div class="role-selector">
+                {% for value, label in form.role.field.choices %}
+                <div class="role-option">
+                    <input type="radio" id="role_{{ value }}" name="role" value="{{ value }}" required>
+                    <label for="role_{{ value }}" class="role-label">
+                        <span class="role-emoji">
+                            {% if value == 'employee' %}👤{% else %}👔{% endif %}
+                        </span>
+                        {% if value == 'employee' %}
+                            <span>Employee</span>
+                            <span style="font-size:11px; font-weight:normal; color:#6b7280;">Submit Expenses</span>
+                        {% else %}
+                            <span>Manager</span>
+                            <span style="font-size:11px; font-weight:normal; color:#6b7280;">Approve Expenses</span>
+                        {% endif %}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+            {% if form.role.errors %}
+                {% for err in form.role.errors %}
+                <p class="field-error">{{ err }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+            <label for="{{ form.password1.id_for_label }}">Password</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+                {% for err in form.password1.errors %}
+                <p class="field-error">{{ err }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+            <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+                {% for err in form.password2.errors %}
+                <p class="field-error">{{ err }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn">✅ Create Account</button>
+    </form>
+    <div class="link">Already have an account? <a href="{% url 'login' %}">Sign in</a></div>
+
+    {% else %}
+    <!-- LOGIN FORM -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" name="username" placeholder="Enter your username" required>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn">🔓 Sign In</button>
+    </form>
+    <div class="link">Don't have an account? <a href="{% url 'register' %}">Register</a></div>
+    {% endif %}
+</div>
+</body>
+</html>
